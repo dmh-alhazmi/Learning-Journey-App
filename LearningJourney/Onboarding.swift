@@ -1,5 +1,6 @@
 import SwiftUI
 
+
 struct OnboardingView: View {
     // MARK: - State
     @State private var subject: String = "Swift"
@@ -22,22 +23,26 @@ struct OnboardingView: View {
                 // Top icon badge (glow + ring)
                 ZStack (){
                     Circle()
-                        .fill(Color(red: 0.25, green: 0.10, blue: 0.00).opacity(0.8))
+                       // .fill(Color(red: 0.25, green: 0.10, blue: 0.00).opacity(0.8))
+                        .fill(Color.orange.opacity(0.11))
                         .frame(width: 109, height: 109)
                         .blur(radius: 18)
                         .overlay(
                             Circle()
+                            
                                 .stroke(
                                     Color.orange.opacity(0.45),
-                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                  //  style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                    style: StrokeStyle(lineWidth: 3)
                                 )
                                 // Apply glass to the ring
                                 .glassEffect(cornerRadius: 54, strokeOpacity: 0.25, backgroundOpacity: 0.12)
-                                .shadow(color: Color.orange.opacity(0.001), radius: 0, x: 0, y: 0)
+                                
+                               // .shadow(color: Color.orange.opacity(0.001), radius: 0, x: 0, y: 0)
                         )
             
                     Image(systemName: "flame.fill")
-                        .font(.system(size: 45))
+                        .font(.system(size: 43, weight: .bold, design: .rounded))
                         .foregroundColor(.orange)
                     
                 }
@@ -165,17 +170,18 @@ struct PrimaryButton: View {
                 .font(.headline.weight(.semibold))
                 .padding(.vertical, 16)
                 .frame(maxWidth: .infinity)
-                .glassEffect(in: .rect(cornerRadius: 100))
+               // .glassEffect(in: .rect(cornerRadius: 100))
                 .background(
                     Capsule()
-                        .fill(Color(red: 0.255, green: 0.146, blue: 0.048))
+                        .fill(Color(red: 0.165, green: 0.076, blue: 0.028))
                         .glassEffect(.clear) // (255, 146, 48, 1)
-                      //  .fill(Color.orange)
+                        
                 ) // solid color, no gradient
-                      /*  .overlay(
+                       /*.overlay(
                             Capsule()
                                 //.stroke(Color.white.opacity(0.10), lineWidth: 1)
-                                .fill(Color(red: 0.255, green: 0.146, blue: 0.048).opacity(0.20))
+                                //.fill(Color(red: 0.255, green: 0.146, blue: 0.048).opacity(0.20))
+                                .fill(Color(red: 0.165, green: 0.076, blue: 0.028))
                                 .glassEffect(.clear)
                             
                         )*/
