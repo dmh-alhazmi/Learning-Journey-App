@@ -32,7 +32,7 @@ struct Onboarding: View {
                                 .frame(width: 140, height: 140)
                                 .blur(radius: 20)
                             Circle()
-                                .stroke(Color.orange.opacity(0.5), lineWidth: 1)
+                                .stroke(Color.orange.opacity(0.5), lineWidth: 0.10)
                                 .frame(width: 120, height: 120)
                                 .shadow(color: .orange.opacity(0.4), radius: 8, x: 0, y: 0)
                             ZStack {
