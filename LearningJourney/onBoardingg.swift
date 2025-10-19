@@ -9,6 +9,9 @@ import Foundation
 import SwiftUI
 
 struct onBoardingg: View {
+    @AppStorage("HabitName") private var HabitName: String = "Swift"
+    @FocusState private var isSubjectFocused: Bool
+    
     var body: some View {
         ZStack{
             //background color
@@ -16,13 +19,12 @@ struct onBoardingg: View {
             Color.black.opacity(0.1).edgesIgnoringSafeArea(.all)
             
             VStack (){
-                Spacer()
-                
-            
+           
                 ZStack (){
                     Circle()
                     .fill(Color(red: 0.25, green: 0.10, blue: 0.00).opacity(0.8))
                     .frame(width: 109, height: 109)
+                    .blur(radius: 18)
                     .overlay(
                         Circle()
                             .stroke(
@@ -39,7 +41,7 @@ struct onBoardingg: View {
                     
             }
             // Headline
-            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                 Text("Hello Learner")
                     .font(.system(size: 40, weight: .heavy, design: .rounded))
                     .foregroundColor(.white)
@@ -47,8 +49,32 @@ struct onBoardingg: View {
                 Text("This app will help you learn everyday!")
                     .font(.system(.subheadline, design: .rounded))
                     .foregroundColor(.white.opacity(0.6))
+                
             }
             .padding()
+                //I want to learn
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("I want to learn")
+                        .font(.system(size: 20 ))
+                        .foregroundColor(.white)
+                    
+                    TextField("Type a topic…", text: $HabitName)
+                        .focused($isSubjectFocused)
+                        .textInputAutocapitalization(.words)
+                        // .disableAutocorrection(true)
+                        .foregroundStyle(.white.opacity(20))
+                        .padding(.vertical, 8)
+                        .colorMultiply(Color.white.opacity(0.9))
+                                        
+                        Divider().background(.white.opacity(0.15))
+                }
+                //I want to learn it in a
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("I want to learn it in a")
+                        .font(.system(size: 20 ))
+                        .foregroundColor(.white)
+                    
+                }
             }
         }
         

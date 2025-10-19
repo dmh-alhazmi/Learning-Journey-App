@@ -1,230 +1,195 @@
-//
-//  Onboarding.swift
-//  LearningJourney
-//
-//  Created by Deemah Alhazmi on 16/10/2025.
-//
-
-import Foundation
 import SwiftUI
 
-struct Onboarding: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    // State
-    @State private var topic: String = "Swift"
-    @State private var selectedDuration: DurationChoice = .week
-    @FocusState private var isTopicFocused: Bool
-
+struct OnboardingView: View {
+    // MARK: - State
+    @State private var subject: String = "Swift"
+    @FocusState private var isSubjectFocused: Bool
+    
+    enum Duration: String, CaseIterable, Identifiable {
+        case week = "Week", month = "Month", year = "Year"
+        var id: String { rawValue }
+    }
+    @State private var duration: Duration = .week
+    
     var body: some View {
         ZStack {
-            // Background
+            // MARK: Background
             Color.black.ignoresSafeArea()
-
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 24) {
-
-                    // Top logo with subtle glow
-                    VStack {
-                        ZStack {
+            
+            // MARK: Content
+            VStack(alignment: .leading, spacing: 24) {
+                
+                // Top icon badge (glow + ring)
+                ZStack (){
+                    Circle()
+                        .fill(Color(red: 0.25, green: 0.10, blue: 0.00).opacity(0.8))
+                        .frame(width: 109, height: 109)
+                        .blur(radius: 18)
+                        .overlay(
                             Circle()
-                                .fill(Color.orange.opacity(0.15))
-                                .frame(width: 140, height: 140)
-                                .blur(radius: 20)
-                            Circle()
-                                .stroke(Color.orange.opacity(0.5), lineWidth: 0.10)
-                                .frame(width: 120, height: 120)
-                                .shadow(color: .orange.opacity(0.4), radius: 8, x: 0, y: 0)
-                            ZStack {
-                                Circle()
-                                    .fill(Color(white: 0.12))
-                                Image(systemName: "flame.fill")
-                                    .font(.system(size: 40, weight: .bold))
-                                    .foregroundColor(.orange)
-                            }
-                            .frame(width: 96, height: 96)
-                            .shadow(color: .orange.opacity(0.35), radius: 10, x: 0, y: 0)
-                        }
-                        .padding(.top, 24)
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    // Headline
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Hello Learner")
-                            .font(.system(size: 40, weight: .heavy, design: .rounded))
-                            .foregroundColor(.white)
-
-                        Text("This app will help you learn everyday!")
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundColor(.white.opacity(0.6))
-                    }
-
-                    // "I want to learn"
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("I want to learn")
-                            .font(.title3.weight(.semibold))
-                            .foregroundColor(.white)
-
-                        TextField("Your topic", text: $topic)
-                            .textInputAutocapitalization(.words)
-                            .disableAutocorrection(true)
-                            .foregroundColor(.white)
-                            .keyboardType(.default)
-                            .focused($isTopicFocused)
-                            .padding(.vertical, 10)
-                            .overlay(
-                                Rectangle()
-                                    .frame(height: 1)
-                                    .foregroundColor(Color.white.opacity(0.15)),
-                                alignment: .bottom
-                            )
-                    }
-                    .padding(.top, 12)
-
-                    // Duration selection
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("I want to learn it in a")
-                            .font(.title3.weight(.semibold))
-                            .foregroundColor(.white)
-
-                        HStack(spacing: 16) {
-                            ForEach(DurationChoice.allCases, id: \.self) { choice in
-                                Button {
-                                    withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                        selectedDuration = choice
-                                    }
-                                } label: {
-                                    Text(choice.label)
-                                        .frame(minWidth: 96)
-                                }
-                                .buttonStyle(PillToggle(isSelected: selectedDuration == choice))
-                                .accessibilityLabel(choice.accessibilityLabel)
-                                .accessibilityAddTraits(selectedDuration == choice ? .isSelected : [])
-                            }
-                        }
-                    }
-
-                    Spacer(minLength: 40)
-
-                    // Start button
-                    Button {
-                        isTopicFocused = false
-                        // Handle start action here (e.g., save onboarding data, navigate)
-                    } label: {
-                        Text("Start learning")
-                            .frame(maxWidth: 128, maxHeight: 48)
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .padding(.top, 12)
-                }
-                .padding(24)
-                .padding(.bottom, 24)
-            }
-        }
-        // Dismiss keyboard on drag
-        .gesture(
-            DragGesture().onChanged { _ in
-                isTopicFocused = false
-            }
-        )
-        .navigationBarHidden(true)
-    }
-}
-
-// MARK: - DurationChoice
-
-enum DurationChoice: CaseIterable {
-    case week, month, year
-
-    var label: String {
-        switch self {
-        case .week: return "Week"
-        case .month: return "Month"
-        case .year: return "Year"
-        }
-    }
-
-    var accessibilityLabel: String {
-        switch self {
-        case .week: return "One week"
-        case .month: return "One month"
-        case .year: return "One year"
-        }
-    }
-}
-
-// MARK: - Styles
-
-struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.orange.opacity(configuration.isPressed ? 0.85 : 1.0),
-                                Color(red: 0.65, green: 0.27, blue: 0.0)
-                                    .opacity(configuration.isPressed ? 0.9 : 1.0)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
+                                .stroke(
+                                    Color.orange.opacity(0.45),
+                                    style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                                )
+                                // Apply glass to the ring
+                                .glassEffect(cornerRadius: 54, strokeOpacity: 0.25, backgroundOpacity: 0.12)
+                                .shadow(color: Color.orange.opacity(0.001), radius: 0, x: 0, y: 0)
                         )
-                    )
-                    .shadow(color: .orange.opacity(0.35), radius: 12, x: 0, y: 6)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(.white.opacity(0.08), lineWidth: 1)
-            )
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 45))
+                        .foregroundColor(.orange)
+                    
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 8)
+                
+                // Headline
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Hello Learner")
+                        .font(.system(size: 40, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.white)
+                    
+                    Text("This app will help you learn everyday!")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.6))
+                }
+                
+                // Section: I want to learn
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("I want to learn")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.white)
+                    
+                    TextField("Type a topic…", text: $subject)
+                        .focused($isSubjectFocused)
+                        .textInputAutocapitalization(.words)
+                        .disableAutocorrection(true)
+                        .foregroundStyle(.white.opacity(0.9))
+                        .padding(.vertical, 8)
+                    
+                    Divider().background(.white.opacity(0.15))
+                }
+                
+                // Section: Duration chips
+                VStack(alignment: .leading, spacing: 14) {
+                    Text("I want to learn it in a")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.white)
+                    
+                    HStack(spacing: 16) {
+                        ForEach(Duration.allCases) { option in
+                            ChoiceChip(
+                                text: option.rawValue,
+                                isSelected: duration == option
+                            ) {
+                                duration = option
+                            }
+                        }
+                    }
+                }
+                
+                Spacer() // pushes button to bottom
+                
+                // Start button
+                PrimaryButton(title: "Start learning") {
+                    // TODO: action (e.g., save onboarding + navigate)
+                }
+              //  .glassEffect(.clear , in: .rect(cornerRadius: 108))
+                .frame(width: 182) // fixed width
+                .frame(maxWidth: .infinity, alignment: .center) // center within parent
+                //.buttonStyle(.borderedProminent)
+                .disabled(subject.trimmingCharacters(in: .whitespaces).isEmpty)
+                .opacity(subject.trimmingCharacters(in: .whitespaces).isEmpty ? 0.6 : 1)
+            }
+            .padding(.horizontal, 28)
+            .padding(.top, 28)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        // Light content for the status bar on dark background
+        .preferredColorScheme(.dark)
     }
 }
 
-struct PillToggle: ButtonStyle {
-    var isSelected: Bool
+// MARK: - Reusable Components
 
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.headline)
-            .padding(.horizontal, 22)
-            .padding(.vertical, 14)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(
-                        isSelected
-                        ? LinearGradient(
-                            colors: [Color.orange, Color(red: 0.65, green: 0.27, blue: 0.0)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                          )
-                        : LinearGradient(
-                            colors: [Color.white.opacity(0.08), Color.white.opacity(0.08)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                          )
-                    )
-            )
-            .overlay(
-                Capsule(style: .continuous)
-                    .stroke(isSelected ? Color.orange.opacity(0.0) : Color.white.opacity(0.12), lineWidth: 1)
-            )
-            .foregroundColor(.white)
-            .shadow(color: isSelected ? Color.orange.opacity(0.35) : .clear, radius: 8, x: 0, y: 4)
-            .opacity(configuration.isPressed ? 0.9 : 1.0)
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+/// Pill-style selectable chip
+struct ChoiceChip: View {
+    let text: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(text)
+                .font(.headline.weight(.semibold))
+                .padding(.horizontal, 22)
+                .padding(.vertical, 12)
+                .background(
+                    Capsule()
+                        .fill(isSelected ? Color.orange : Color.clear)
+                        .overlay(
+                            Capsule()
+                                .stroke(.white.opacity(isSelected ? 0.0 : 0.18), lineWidth: 1)
+                        )
+                        .modifier(GlassWhenUnselected(isSelected: isSelected))
+                        .shadow(radius: isSelected ? 8 : 0)
+                )
+                .foregroundStyle(isSelected ? .white : .white.opacity(0.9))
+        }
+        .buttonStyle(.plain)
     }
 }
 
+private struct GlassWhenUnselected: ViewModifier {
+    let isSelected: Bool
+    func body(content: Content) -> some View {
+        if isSelected {
+            content
+        } else {
+            content
+                .glassEffect(cornerRadius: 28, strokeOpacity: 0.18, backgroundOpacity: 0.22)
+        }
+    }
+}
+
+/// Primary rounded button with subtle gradient
+struct PrimaryButton: View {
+    let title: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+            
+                .font(.headline.weight(.semibold))
+                .padding(.vertical, 16)
+                .frame(maxWidth: .infinity)
+                .glassEffect(in: .rect(cornerRadius: 100))
+                .background(
+                    Capsule()
+                        .fill(Color(red: 0.255, green: 0.146, blue: 0.048))
+                        .glassEffect(.clear) // (255, 146, 48, 1)
+                      //  .fill(Color.orange)
+                ) // solid color, no gradient
+                      /*  .overlay(
+                            Capsule()
+                                //.stroke(Color.white.opacity(0.10), lineWidth: 1)
+                                .fill(Color(red: 0.255, green: 0.146, blue: 0.048).opacity(0.20))
+                                .glassEffect(.clear)
+                            
+                        )*/
+                      //  .shadow(color: Color.orange.opacity(0.25), radius: 12, y: 6)
+                
+                .foregroundStyle(.white)
+        }
+        
+        .buttonStyle(.plain)
+        .padding(.bottom, 24)
+    }
+}
+
+// MARK: - Preview
 #Preview {
-    NavigationStack {
-        Onboarding()
-    }
-    .preferredColorScheme(.dark)
+    OnboardingView()
 }
