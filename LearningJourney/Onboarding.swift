@@ -3,7 +3,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     // MARK: - State
-    @State private var subject: String = "Swift"
+    @State public var Habbit: String = "Swift"
     @FocusState private var isSubjectFocused: Bool
     
     enum Duration: String, CaseIterable, Identifiable {
@@ -11,108 +11,122 @@ struct OnboardingView: View {
         var id: String { rawValue }
     }
     @State private var duration: Duration = .week
+
+    // MARK: - Navigation
+    private enum Route: Hashable {
+        case activity
+    }
+    @State private var path: [Route] = []
     
     var body: some View {
-        ZStack {
-            // MARK: Background
-            Color.black.ignoresSafeArea()
-            
-            // MARK: Content
-            VStack(alignment: .leading, spacing: 24) {
+        NavigationStack(path: $path) {
+            ZStack {
+                // MARK: Background
+                Color.black.ignoresSafeArea()
                 
-                // Top icon badge (glow + ring)
-                ZStack (){
-                    Circle()
-                       // .fill(Color(red: 0.25, green: 0.10, blue: 0.00).opacity(0.8))
-                        .fill(Color.orange.opacity(0.11))
-                        .frame(width: 109, height: 109)
-                        .blur(radius: 18)
-                        .overlay(
-                            Circle()
-                            
-                                .stroke(
-                                    Color.orange.opacity(0.45),
-                                  //  style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                                    style: StrokeStyle(lineWidth: 3)
-                                )
-                                // Apply glass to the ring
-                                .glassEffect(cornerRadius: 54, strokeOpacity: 0.25, backgroundOpacity: 0.12)
-                                
-                               // .shadow(color: Color.orange.opacity(0.001), radius: 0, x: 0, y: 0)
-                        )
-            
-                    Image(systemName: "flame.fill")
-                        .font(.system(size: 43, weight: .bold, design: .rounded))
-                        .foregroundColor(.orange)
+                // MARK: Content
+                VStack(alignment: .leading, spacing: 24) {
                     
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 8)
-                
-                // Headline
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Hello Learner")
-                        .font(.system(size: 40, weight: .heavy, design: .rounded))
-                        .foregroundStyle(.white)
+                    // Top icon badge (glow + ring)
+                    ZStack (){
+                        
+                        Circle()
+                            .fill(Color(red: 97/225, green: 56/225, blue: 20/225) .opacity(0.3))
+                            //.fill(Color.orange.opacity(0.11))
+                            .frame(width: 109, height: 109)
+                            .glassEffect(.clear)
+                        
+                            .overlay(
+                                Circle()
+                                    .stroke(Color(red: 97/225, green: 56/225, blue: 20/225) .opacity(0.4), lineWidth: 4)
+                                    .blur(radius: 2)
+                                    .offset(x: 1, y: 1)
+                                    .mask(Circle().fill(LinearGradient(colors: [.black, .clear],
+                                                                       startPoint: .topLeading,
+                                                                       endPoint: .bottomTrailing)))
+                            )
+                            .frame(width: 120, height: 120)
+                        
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 43, weight: .bold, design: .rounded))
+                            .foregroundColor(.orange)
+                        
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 8)
                     
-                    Text("This app will help you learn everyday!")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.6))
-                }
-                
-                // Section: I want to learn
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("I want to learn")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white)
+                    // Headline
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Hello Learner")
+                            .font(.system(size: 40, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.white)
+                        
+                        Text("This app will help you learn everyday!")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
                     
-                    TextField("Type a topic…", text: $subject)
-                        .focused($isSubjectFocused)
-                        .textInputAutocapitalization(.words)
-                        .disableAutocorrection(true)
-                        .foregroundStyle(.white.opacity(0.9))
-                        .padding(.vertical, 8)
+                    // Section: I want to learn
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("I want to learn")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.white)
+                        
+                        TextField("Type a topic…", text: $Habbit)
+                            .focused($isSubjectFocused)
+                            .textInputAutocapitalization(.words)
+                            .disableAutocorrection(true)
+                            .foregroundStyle(.white.opacity(0.9))
+                            .padding(.vertical, 8)
+                        
+                        Divider().background(.white.opacity(0.15))
+                    }
                     
-                    Divider().background(.white.opacity(0.15))
-                }
-                
-                // Section: Duration chips
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("I want to learn it in a")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white)
-                    
-                    HStack(spacing: 16) {
-                        ForEach(Duration.allCases) { option in
-                            ChoiceChip(
-                                text: option.rawValue,
-                                isSelected: duration == option
-                            ) {
-                                duration = option
+                    // Section: Duration chips
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("I want to learn it in a")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.white)
+                        
+                        HStack(spacing: 16) {
+                            ForEach(Duration.allCases) { option in
+                                ChoiceChip(
+                                    text: option.rawValue,
+                                    isSelected: duration == option
+                                ) {
+                                    duration = option
+                                }
                             }
                         }
                     }
+                    
+                    Spacer() // pushes button to bottom
+                    
+                    // Start button
+                    PrimaryButton(title: "") {
+                        // Save onboarding data if needed, then navigate
+                        // e.g., UserDefaults.standard.set(subject, forKey: "HabitName")
+                        path.append(.activity)
+                    }
+                    .frame(width: 182) // fixed width
+                    .frame(maxWidth: .infinity, alignment: .center) // center within parent
+                    .disabled(Habbit.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .opacity(Habbit.trimmingCharacters(in: .whitespaces).isEmpty ? 0.6 : 1)
                 }
-                
-                Spacer() // pushes button to bottom
-                
-                // Start button
-                PrimaryButton(title: "Start learning") {
-                    // TODO: action (e.g., save onboarding + navigate)
-                }
-              //  .glassEffect(.clear , in: .rect(cornerRadius: 108))
-                .frame(width: 182) // fixed width
-                .frame(maxWidth: .infinity, alignment: .center) // center within parent
-                //.buttonStyle(.borderedProminent)
-                .disabled(subject.trimmingCharacters(in: .whitespaces).isEmpty)
-                .opacity(subject.trimmingCharacters(in: .whitespaces).isEmpty ? 0.6 : 1)
+                .padding(.horizontal, 28)
+                .padding(.top, 28)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .padding(.horizontal, 28)
-            .padding(.top, 28)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            // Light content for the status bar on dark background
+            .preferredColorScheme(.dark)
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .activity:
+                    ActivityView()
+                        .navigationBarBackButtonHidden(true)
+                }
+            }
         }
-        // Light content for the status bar on dark background
-        .preferredColorScheme(.dark)
     }
 }
 
@@ -132,7 +146,7 @@ struct ChoiceChip: View {
                 .padding(.vertical, 12)
                 .background(
                     Capsule()
-                        .fill(isSelected ? Color.orange : Color.clear)
+                        .fill(isSelected ? Color(red: 255/225, green: 146/225, blue: 20/225) : Color.clear)
                         .overlay(
                             Capsule()
                                 .stroke(.white.opacity(isSelected ? 0.0 : 0.18), lineWidth: 1)
@@ -151,9 +165,13 @@ private struct GlassWhenUnselected: ViewModifier {
     func body(content: Content) -> some View {
         if isSelected {
             content
+                //.glassEffect( .regular )
+                .glassEffect(.regular.tint(.red.opacity(0.4)).interactive())
         } else {
             content
-                .glassEffect(cornerRadius: 28, strokeOpacity: 0.18, backgroundOpacity: 0.22)
+              //  .glassEffect(cornerRadius: 28, strokeOpacity: 0.18, backgroundOpacity: 0.22)
+                .glassEffect( .clear .interactive())
+            
         }
     }
 }
@@ -165,31 +183,27 @@ struct PrimaryButton: View {
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-            
+            Text("Start Learning")
+
                 .font(.headline.weight(.semibold))
                 .padding(.vertical, 16)
                 .frame(maxWidth: .infinity)
-               // .glassEffect(in: .rect(cornerRadius: 100))
+                .glassEffect(.regular.tint(.red.opacity(0.3)).interactive())
                 .background(
                     Capsule()
-                        .fill(Color(red: 0.165, green: 0.076, blue: 0.028))
-                        .glassEffect(.clear) // (255, 146, 48, 1)
-                        
-                ) // solid color, no gradient
-                       /*.overlay(
-                            Capsule()
-                                //.stroke(Color.white.opacity(0.10), lineWidth: 1)
-                                //.fill(Color(red: 0.255, green: 0.146, blue: 0.048).opacity(0.20))
-                                .fill(Color(red: 0.165, green: 0.076, blue: 0.028))
-                                .glassEffect(.clear)
-                            
-                        )*/
-                      //  .shadow(color: Color.orange.opacity(0.25), radius: 12, y: 6)
-                
+                        .fill(Color(red: 255/225, green: 146/225, blue: 20/225))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(Color.white .opacity(0.4), lineWidth: 2)
+                        .blur(radius: 1)
+                        .mask(Capsule().fill(LinearGradient(colors: [.white, .clear],
+                                                           startPoint: .topLeading,
+                                                           endPoint: .bottomTrailing)))
+                )
+                .glassEffect( .regular .interactive())
                 .foregroundStyle(.white)
         }
-        
         .buttonStyle(.plain)
         .padding(.bottom, 24)
     }
