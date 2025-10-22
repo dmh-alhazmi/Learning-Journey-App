@@ -10,8 +10,7 @@ import SwiftUI
 @main
 struct LearningJourneyApp: App {
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+        WindowGroup { OnboardingView().preferredColorScheme(.dark) }
     }
 }
+

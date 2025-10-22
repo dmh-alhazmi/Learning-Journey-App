@@ -56,28 +56,39 @@ struct StatPill: View {
     let icon: String
     let title: String
     let subtitle: String
-    let tint: Color
+    let tint: Color         // Color for icon
+    let background: Color   // Color for whole StatPill background
+    
     var body: some View {
         HStack(spacing: 10) {
+            // Icon with color fill
             Image(systemName: icon)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(tint) // directly color the icon, not its background
                 .frame(width: 22, height: 22)
-                .background(Circle().fill(tint.opacity(0.9)))
+            
             VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.headline.weight(.semibold)).foregroundStyle(.white)
-                Text(subtitle).font(.caption).foregroundStyle(Theme.sub)
+                Text(title)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(Theme.sub)
             }
+            
             Spacer(minLength: 0)
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 12)
+        // background color for the whole pill
         .background(
-            Capsule().fill(Theme.chip)
-                .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
+            Capsule()
+                .fill(background)
+                .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1 ).glassEffect())
         )
     }
 }
+
 
 // Month + Year picker (only one declaration in project)
 struct MonthYearPickerView: View {
