@@ -9,27 +9,23 @@ import SwiftUI
 import Combine
 
 struct ActivityView: View {
-    // Plan controls the freeze allowance window
-    @State private var plan: Plan = .week
+    // Use the view model that already contains scheduling and state.
+    @StateObject private var vm = ActivityViewModel()
 
-    // The month being browsed (we show weeks within this month)
-    @State private var selectedMonthAnchor = Date()  // any date within the month
+    // Month/year pickers and date wheel state
     @State private var showMonthPicker = false
     @State private var selectedDate = Date()
     @State private var showSystemPicker = false
+    @State private var showCalendar = false
+    @State private var showLearningGoal = false
 
-    // Which week (0..n) inside the month we’re showing
-    @State private var weekOffset: Int = 0
 
-    // Persisted log for demo (date -> status). In a real app, move to VM / storage.
-    @State private var log: [Date: DayStatus] = [:]
-
-    // Tick at midnight to refresh today state
-    @State private var midnightCancellable: AnyCancellable?
+    // Routing for value-based navigation
+    private enum Route: Hashable { case learningGoal }
 
     var body: some View {
         ZStack {
-            Theme.bg.ignoresSafeArea()
+          //  Theme.bg.ignoresSafeArea()
             VStack(spacing: 20) {
                 header
                 card
@@ -38,13 +34,27 @@ struct ActivityView: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
+            .navigationDestination(isPresented: $showLearningGoal) {
+                        LearningGoal()
+                    }
+                    .navigationDestination(isPresented: $showCalendar) {
+                        CalendarView()
+                    }
+        }
+        // 👇 Destination mapping for value-based links in this view
+        .navigationDestination(for: Route.self) { route in
+            switch route {
+            case .learningGoal:
+                LearningGoal()
+                    .navigationBarBackButtonHidden(false)
+            }
         }
         // Month/Year custom sheet
         .sheet(isPresented: $showMonthPicker) {
-            MonthYearPickerView(initial: selectedMonthAnchor) { newMonth in
-                selectedMonthAnchor = newMonth
+            MonthYearPickerView(initial: vm.selectedMonthAnchor) { newMonth in
+                vm.selectedMonthAnchor = newMonth
                 selectedDate = newMonth
-                weekOffset = 0 // reset to first week in that month
+                vm.weekOffset = 0 // reset to first week in that month
             }
             .preferredColorScheme(.dark)
         }
@@ -62,8 +72,8 @@ struct ActivityView: View {
                     .tint(.white)
 
                 Button("Done") {
-                    selectedMonthAnchor = selectedDate
-                    weekOffset = 0
+                    vm.selectedMonthAnchor = selectedDate
+                    vm.weekOffset = 0
                     showSystemPicker = false
                 }
                 .font(.headline.weight(.semibold))
@@ -81,7 +91,7 @@ struct ActivityView: View {
             .background(Theme.bg)
             .preferredColorScheme(.dark)
         }
-        .onAppear { scheduleMidnightRefresh() }
+        .onAppear { vm.scheduleMidnightRefresh() }
         .preferredColorScheme(.dark)
     }
 }
@@ -97,7 +107,7 @@ private extension ActivityView {
 
             Spacer()
 
-            // calender button
+            // calendar button (sheet trigger later if you want)
             Button {
                 // showMonthPicker = true
             } label: {
@@ -111,24 +121,21 @@ private extension ActivityView {
                     )
                     .foregroundStyle(.white)
             }
+            .buttonStyle(.plain)
 
-            // Edit Button
-            Button {
-                // showMonthPicker = true
-            } label: {
-                Image(systemName: "pencil.and.outline")
-                    .padding(10)
-                    .background(
-                        Circle()
-                            .fill(Color.white.opacity(0.1))
-                            .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
-                            .glassEffect(.clear .interactive(true))
-                    )
-                    .foregroundStyle(.white)
-            }
+            // Edit Button -> LearningGoal (value-based link)
+            // Learning goal button (Task 3 + 4)
+                        Button { showLearningGoal = true } label: {
+                            Image(systemName: "pencil.and.outline")
+                                .padding(10)
+                                .background(Circle().fill(.white.opacity(0.1)))
+                                .foregroundStyle(.white)
+                        }
+                        .buttonStyle(.plain)
         }
     }
 }
+
 
 // MARK: - Card (Month + Week strip + Stats)
 
@@ -140,7 +147,7 @@ private extension ActivityView {
             HStack(spacing: 12) {
                 Button { showMonthPicker = true } label: {
                     HStack(spacing: 6) {
-                        Text(monthYear(selectedMonthAnchor)).font(.headline)
+                        Text(monthYear(vm.selectedMonthAnchor)).font(.headline)
                         Image(systemName: "chevron.right" ).font(.subheadline.weight(.semibold) )
                     }
                     .foregroundStyle(Theme.label)
@@ -189,7 +196,7 @@ private extension ActivityView {
             ForEach(days, id: \.self) { d in
                 let isToday = Calendar.current.isDateInToday(d)
                 let number  = Calendar.current.component(.day, from: d)
-                let status  = statusForDate(d)
+                let status  = vm.statusForDate(d)
 
                 VStack(spacing: 6) {
                     Text(shortWeekday(d).uppercased())
@@ -221,14 +228,13 @@ private extension ActivityView {
 private extension ActivityView {
     var bigCircle: some View {
         Button {
-            if case .none = todayStatus { setStatus(.learned, for: Date()) }
+            if case .none = vm.todayStatus { vm.setStatus(.learned, for: Date()) }
         } label: {
             ZStack {
-                switch todayStatus {
+                switch vm.todayStatus {
                 case .none:
                     Circle().fill(Theme.orange).glassEffect(.regular)
                         .overlay(Circle().stroke(Theme.orange.opacity(0.2), lineWidth: 0.01).glassEffect(.regular .tint(Theme.orange) .interactive()))
-                        //.shadow(color: Theme.orange.opacity(0.45), radius: 20, y: 8)
                     Text("Log as\nLearned").foregroundStyle(.white)
 
                 case .learned:
@@ -249,7 +255,7 @@ private extension ActivityView {
             .frame(width: 280, height: 280)
         }
         .buttonStyle(.plain)
-        .disabled(todayStatus != .none) // disable if already learned/frozen today
+        .disabled(vm.todayStatus != .none) // disable if already learned/frozen today
     }
 }
 
@@ -259,7 +265,7 @@ private extension ActivityView {
     var freezeSection: some View {
         VStack(spacing: 8) {
             Button {
-                if todayStatus == .none && freezesLeft > 0 { setStatus(.frozen, for: Date()) }
+                if vm.todayStatus == .none && freezesLeft > 0 { vm.setStatus(.frozen, for: Date()) }
             } label: {
                 Text("Log as Freezed")
                     .font(.headline.weight(.semibold))
@@ -267,15 +273,15 @@ private extension ActivityView {
                     .frame(maxWidth: .infinity)
                     .background(
                         Capsule()
-                            .fill(Theme.teal.opacity((todayStatus == .none && freezesLeft > 0) ? 1.0 : 0.22))
+                            .fill(Theme.teal.opacity((vm.todayStatus == .none && freezesLeft > 0) ? 1.0 : 0.22))
                             .overlay(Capsule().stroke(Theme.stroke, lineWidth: 1))
                     )
                     .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
-            .disabled(!(todayStatus == .none && freezesLeft > 0))
+            .disabled(!(vm.todayStatus == .none && freezesLeft > 0))
 
-            Text("\(usedFreezes) out of \(plan.freezeAllowance) Freezes used")
+            Text("\(usedFreezes) out of \(vm.plan.freezeAllowance) Freezes used")
                 .font(.footnote)
                 .foregroundStyle(Theme.sub)
         }
@@ -291,8 +297,8 @@ private extension ActivityView {
 
     /// First day of the selected month
     var firstOfMonth: Date {
-        let comps = calendar.dateComponents([.year, .month], from: selectedMonthAnchor)
-        return calendar.date(from: comps) ?? selectedMonthAnchor
+        let comps = calendar.dateComponents([.year, .month], from: vm.selectedMonthAnchor)
+        return calendar.date(from: comps) ?? vm.selectedMonthAnchor
     }
 
     /// All weeks that intersect the month (each is an array of 7 dates, Sunday–Saturday)
@@ -322,14 +328,14 @@ private extension ActivityView {
         guard !weeks.isEmpty else { return [] }
 
         // Clamp any manual offset
-        let clamped = min(max(0, weekOffset), weeks.count - 1)
+        let clamped = min(max(0, vm.weekOffset), weeks.count - 1)
 
         // Prefer today's week when viewing the current month and the user hasn't moved weeks yet
         let today = calendar.startOfDay(for: Date())
         let (mAnchor, yAnchor) = (calendar.component(.month, from: firstOfMonth), calendar.component(.year, from: firstOfMonth))
         let (mToday,  yToday)  = (calendar.component(.month, from: today),         calendar.component(.year, from: today))
 
-        if weekOffset == 0, mAnchor == mToday, yAnchor == yToday,
+        if vm.weekOffset == 0, mAnchor == mToday, yAnchor == yToday,
            let idx = weekIndexContaining(today, in: weeks) {
             return weeks[idx]
         }
@@ -338,19 +344,19 @@ private extension ActivityView {
     }
 
     func moveWeek(_ delta: Int) {
-        let new = weekOffset + delta
+        let new = vm.weekOffset + delta
         if new < 0 {
             if let prev = calendar.date(byAdding: .month, value: -1, to: firstOfMonth) {
-                selectedMonthAnchor = prev
-                weekOffset = max(weeksInMonth.count - 1, 0)
+                vm.selectedMonthAnchor = prev
+                vm.weekOffset = max(weeksInMonth.count - 1, 0)
             }
         } else if new >= weeksInMonth.count {
             if let next = calendar.date(byAdding: .month, value: 1, to: firstOfMonth) {
-                selectedMonthAnchor = next
-                weekOffset = 0
+                vm.selectedMonthAnchor = next
+                vm.weekOffset = 0
             }
         } else {
-            weekOffset = new
+            vm.weekOffset = new
         }
     }
 
@@ -361,18 +367,12 @@ private extension ActivityView {
         let f = DateFormatter(); f.dateFormat = "EEE"; return f.string(from: d)
     }
 
-    // Normalize to startOfDay as dictionary key
-    func key(_ date: Date) -> Date { calendar.startOfDay(for: date) }
-
-    func statusForDate(_ date: Date) -> DayStatus { log[key(date)] ?? .none }
-    func setStatus(_ s: DayStatus, for date: Date) { log[key(date)] = s }
-
-    var todayStatus: DayStatus { statusForDate(Date()) }
+    var todayStatus: DayStatus { vm.todayStatus } // kept if needed elsewhere
 
     // STAT window depends on plan
     var statWindowRange: (start: Date, end: Date) {
         let today = calendar.startOfDay(for: Date())
-        switch plan {
+        switch vm.plan {
         case .week:
             let comp  = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)
             let start = calendar.date(from: comp) ?? today
@@ -390,42 +390,14 @@ private extension ActivityView {
     }
 
     var learnedCountInWindow: Int {
-        log.filter { $0.value == .learned && $0.key >= statWindowRange.start && $0.key < statWindowRange.end }.count
+        vm.log.filter { $0.value == .learned && $0.key >= statWindowRange.start && $0.key < statWindowRange.end }.count
     }
     var frozenCountInWindow: Int {
-        log.filter { $0.value == .frozen  && $0.key >= statWindowRange.start && $0.key < statWindowRange.end }.count
+        vm.log.filter { $0.value == .frozen  && $0.key >= statWindowRange.start && $0.key < statWindowRange.end }.count
     }
 
     var usedFreezes: Int { frozenCountInWindow }
-    var freezesLeft: Int { max(0, plan.freezeAllowance - usedFreezes) }
-
-}
-
-// MARK: - Midnight reset (enable buttons next day)
-
-private extension ActivityView {
-    func scheduleMidnightRefresh() {
-        // Cancel previous
-        midnightCancellable?.cancel()
-
-        // Time until next midnight
-        let now = Date()
-        let cal = Calendar.current
-        let nextMidnight = cal.nextDate(
-            after: now,
-            matching: DateComponents(hour: 0, minute: 0, second: 1),
-            matchingPolicy: .nextTimePreservingSmallerComponents
-        ) ?? now.addingTimeInterval(86401)
-
-        let delay = nextMidnight.timeIntervalSince(now)
-
-        midnightCancellable = Just(())
-            .delay(for: .seconds(delay), scheduler: RunLoop.main)
-            .sink { _ in
-                // Trigger a re-computation then reschedule
-                scheduleMidnightRefresh()
-            }
-    }
+    var freezesLeft: Int { max(0, vm.plan.freezeAllowance - usedFreezes) }
 }
 
 // MARK: - Shape styles for week dots
@@ -462,5 +434,6 @@ private var isPreview: Bool {
 }
 
 #Preview {
-    ActivityView().preferredColorScheme(.dark)
+    // Wrap in a NavigationStack so the pencil link works in the preview
+    NavigationStack { ActivityView().preferredColorScheme(.dark) }
 }
