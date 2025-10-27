@@ -31,10 +31,3 @@ Below is the main user journey inside **LearningJourney** — showing how users 
 
 ---
 
-📊 **User Flow Diagram**
-
-![User Flow](Docs/userflow.png)
-*(Source: Screenshot from Figma — tasks 1–5 visualized)*
-
----
-
