@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
-    // MARK: - State
+    // MARK: - User input
     @State public var Habbit: String = "Swift"
     @FocusState private var isSubjectFocused: Bool
 
@@ -11,12 +11,17 @@ struct OnboardingView: View {
     }
     @State private var duration: Duration = .week
 
-    // Trigger to push ActivityView
-    @State private var goToActivity = false
+    // MARK: - Persist (so LearningGoal/Activity can read defaults)
+    @AppStorage("habit_name") private var habitName: String = "Learning"
+    @AppStorage("habit_plan") private var habitPlanRaw: String = Plan.week.rawValue
+
+    // MARK: - Completion (provided by RootView)
+    let onDone: () -> Void
+    init(onDone: @escaping () -> Void = {}) { self.onDone = onDone }
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            // Color.black.ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 24) {
 
@@ -31,9 +36,13 @@ struct OnboardingView: View {
                                 .stroke(Color(red: 97/225, green: 56/225, blue: 20/225).opacity(0.4), lineWidth: 4)
                                 .blur(radius: 2)
                                 .offset(x: 1, y: 1)
-                                .mask(Circle().fill(LinearGradient(colors: [.black, .clear],
-                                                                   startPoint: .topLeading,
-                                                                   endPoint: .bottomTrailing)))
+                                .mask(
+                                    Circle().fill(
+                                        LinearGradient(colors: [.black, .clear],
+                                                       startPoint: .topLeading,
+                                                       endPoint: .bottomTrailing)
+                                    )
+                                )
                         )
                         .frame(width: 120, height: 120)
 
@@ -89,12 +98,15 @@ struct OnboardingView: View {
 
                 Spacer()
 
-                // Start button -> trigger boolean
-                PrimaryButton(title: "") {
-                    // Persist if you want:
-                    // UserDefaults.standard.set(Habbit, forKey: "habit_name")
-                    // UserDefaults.standard.set(duration.rawValue, forKey: "habit_duration")
-                    goToActivity = true
+                // Start button -> save + notify RootView
+                PrimaryButton(title: "Start Learning") {
+                    // Save what the user chose so other screens can use it immediately
+                    let trimmed = Habbit.trimmingCharacters(in: .whitespacesAndNewlines)
+                    habitName = trimmed.isEmpty ? "Learning" : trimmed
+                    habitPlanRaw = mapToPlan(duration).rawValue
+
+                    // Hand control back to RootView (dismiss cover and open LearningGoal)
+                    onDone()
                 }
                 .frame(width: 182)
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -106,15 +118,18 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .preferredColorScheme(.dark)
-        // ✅ Modern navigation push (requires a parent NavigationStack at the app root)
-        .navigationDestination(isPresented: $goToActivity) {
-            ActivityView()
-                .navigationBarBackButtonHidden(true)
+    }
+
+    // Map Onboarding.Duration -> your app's Plan type
+    private func mapToPlan(_ d: Duration) -> Plan {
+        switch d {
+        case .week:  return .week
+        case .month: return .month
+        case .year:  return .year
         }
     }
 }
 
 #Preview {
-    // For previews only; at runtime your app root already wraps a NavigationStack (Option A).
-    NavigationStack { OnboardingView() }
+    OnboardingView()
 }

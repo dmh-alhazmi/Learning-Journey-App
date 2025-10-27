@@ -11,10 +11,9 @@ import SwiftUI
 struct LearningJourneyApp: App {
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                OnboardingView()    
-            }
+                    RootView()
+                }
         }
     }
-}
+
 

@@ -9,56 +9,47 @@ import SwiftUI
 import Combine
 
 struct ActivityView: View {
-    // Use the view model that already contains scheduling and state.
+    // View model
     @StateObject private var vm = ActivityViewModel()
 
-    // Month/year pickers and date wheel state
+    // Persisted goal info
+    @AppStorage("habit_name") private var habitName: String = "Learning"
+    @AppStorage("habit_plan") private var habitPlanRaw: String = Plan.week.rawValue
+
+    // UI state
     @State private var showMonthPicker = false
     @State private var selectedDate = Date()
     @State private var showSystemPicker = false
     @State private var showCalendar = false
     @State private var showLearningGoal = false
 
-
-    // Routing for value-based navigation
-    private enum Route: Hashable { case learningGoal }
+    private var habitPlan: Plan { Plan(rawValue: habitPlanRaw) ?? .week }
 
     var body: some View {
         ZStack {
-          //  Theme.bg.ignoresSafeArea()
-            VStack(spacing: 20) {
-                header
-                card
-                bigCircle
-                freezeSection
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .navigationDestination(isPresented: $showLearningGoal) {
-                        LearningGoal()
-                    }
-                    .navigationDestination(isPresented: $showCalendar) {
-                        CalendarView()
-                    }
-        }
-        // 👇 Destination mapping for value-based links in this view
-        .navigationDestination(for: Route.self) { route in
-            switch route {
-            case .learningGoal:
-                LearningGoal()
-                    .navigationBarBackButtonHidden(false)
+            // Theme.bg.ignoresSafeArea()
+
+            if isGoalCompleted {
+                goalCompletedView
+            } else {
+                VStack(spacing: 20) {
+                    header
+                    card
+                    bigCircle
+                    freezeSection
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
             }
         }
-        // Month/Year custom sheet
         .sheet(isPresented: $showMonthPicker) {
             MonthYearPickerView(initial: vm.selectedMonthAnchor) { newMonth in
                 vm.selectedMonthAnchor = newMonth
                 selectedDate = newMonth
-                vm.weekOffset = 0 // reset to first week in that month
+                vm.weekOffset = 0
             }
             .preferredColorScheme(.dark)
         }
-        // System date picker (wheel) sheet
         .sheet(isPresented: $showSystemPicker) {
             VStack(spacing: 16) {
                 Text("Select Date")
@@ -91,10 +82,15 @@ struct ActivityView: View {
             .background(Theme.bg)
             .preferredColorScheme(.dark)
         }
-        .onAppear { vm.scheduleMidnightRefresh() }
+        .onAppear {
+            vm.scheduleMidnightRefresh()
+            // Keep VM plan in sync with stored plan
+            vm.plan = habitPlan
+        }
         .preferredColorScheme(.dark)
     }
 }
+
 
 // MARK: - Header
 
@@ -107,9 +103,10 @@ private extension ActivityView {
 
             Spacer()
 
-            // calendar button (sheet trigger later if you want)
-            Button {
-                // showMonthPicker = true
+            // Calendar Button
+            NavigationLink {
+                CalendarView(vm: CalendarViewModel(activityVM: vm))
+                    .navigationBarTitleDisplayMode(.inline)
             } label: {
                 Image(systemName: "calendar")
                     .padding(10)
@@ -123,15 +120,32 @@ private extension ActivityView {
             }
             .buttonStyle(.plain)
 
-            // Edit Button -> LearningGoal (value-based link)
-            // Learning goal button (Task 3 + 4)
-                        Button { showLearningGoal = true } label: {
-                            Image(systemName: "pencil.and.outline")
-                                .padding(10)
-                                .background(Circle().fill(.white.opacity(0.1)))
-                                .foregroundStyle(.white)
-                        }
-                        .buttonStyle(.plain)
+            // Edit Button -> LearningGoal
+            Button {
+                showLearningGoal = true
+            } label: {
+                Image(systemName: "pencil.and.outline")
+                    .padding(10)
+                    .background(
+                        Circle()
+                            .fill(Color.white.opacity(0.1))
+                            .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                            .glassEffect(.clear .interactive(true))
+                    )
+                    .foregroundStyle(.white)
+                    .contentShape(Circle())
+            }
+            .sheet(isPresented: $showLearningGoal) {
+                NavigationStack {
+                    LearningGoal {
+                        // Close the sheet after saving/updating the goal
+                        showLearningGoal = false
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
+                }
+            }
+            .buttonStyle(.plain)
+
         }
     }
 }
@@ -167,6 +181,10 @@ private extension ActivityView {
 
             Divider().background(Theme.stroke)
 
+            Text("Learning \(habitName.trimmingCharacters(in: .whitespacesAndNewlines))") 
+                .font(.headline)
+                .foregroundStyle(Theme.label)
+
             // Stats
             HStack(spacing: 12) {
                 StatPill(icon: "flame.fill",
@@ -176,7 +194,7 @@ private extension ActivityView {
                          background: Theme.orange)
                 StatPill(icon: "cube.fill",
                          title: "\(frozenCountInWindow)",
-                         subtitle: frozenCountInWindow == 1 ? "Day Freezed" : "Days Freezed",
+                         subtitle: frozenCountInWindow == 1 ? "Day Frozen" : "Days Frozen",
                          tint: Theme.teal,
                          background: Theme.teal)
             }
@@ -185,7 +203,6 @@ private extension ActivityView {
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous )
                 .fill(Theme.card)
-                //.glassEffect(.clear)
                 .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Theme.stroke, lineWidth: 1))
         )
     }
@@ -247,7 +264,7 @@ private extension ActivityView {
                     Circle().fill(Theme.bg)
                         .overlay(Circle().stroke(Theme.teal.opacity(0.8), lineWidth: 2).glassEffect(.regular))
                         .shadow(color: Theme.teal.opacity(0.15), radius: 10, y: 2).glassEffect(.regular)
-                    Text("Day\nFreezed").foregroundStyle(Theme.teal)
+                    Text("Day\nFrozen").foregroundStyle(Theme.teal)
                 }
             }
             .font(.system(size: 28, weight: .bold, design: .rounded))
@@ -398,6 +415,23 @@ private extension ActivityView {
 
     var usedFreezes: Int { frozenCountInWindow }
     var freezesLeft: Int { max(0, vm.plan.freezeAllowance - usedFreezes) }
+
+    // MARK: - Goal Completion Logic
+
+    /// Number of days in the current stat window
+    var windowDays: Int {
+        calendar.dateComponents([.day], from: statWindowRange.start, to: statWindowRange.end).day ?? 0
+    }
+
+    /// Minimum learned days needed to complete, considering allowed freezes for the plan
+    var requiredLearnedDays: Int {
+        max(0, windowDays - vm.plan.freezeAllowance)
+    }
+
+    /// Completed when learned days meet the target (freezes can fill the rest)
+    var isGoalCompleted: Bool {
+        learnedCountInWindow >= requiredLearnedDays
+    }
 }
 
 // MARK: - Shape styles for week dots
@@ -427,6 +461,74 @@ private extension ActivityView {
     }
 }
 
+// MARK: - Goal Completed View
+
+private extension ActivityView {
+    var goalCompletedView: some View {
+        VStack(spacing: 24) {
+            header
+            card
+
+            VStack(spacing: 14) {
+                Image(systemName: "hands.sparkles.fill")
+                    .font(.system(size: 44))
+                    .foregroundStyle(Theme.orange)
+
+                Text("Well done!")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(Theme.orange)
+
+                Text("Goal completed! Start learning again or set a new learning goal.")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 30)
+            }
+            .frame(maxHeight: .infinity, alignment: .center)
+
+            VStack(spacing: 12) {
+                // ✅ pass onDone so it compiles
+                NavigationLink {
+                    LearningGoal {
+                        // After saving a new goal, nothing special to do here
+                        // (the user will be popped back automatically)
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
+                } label: {
+                    Text("Set new learning goal")
+                        .font(.headline.weight(.semibold))
+                        .padding(.vertical, 14)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Capsule()
+                                .fill(Theme.orange)
+                                .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+                        )
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
+
+                // For now, route to LearningGoal as well
+                NavigationLink {
+                    LearningGoal {
+                        // Could prefill with same values before presenting (if you add that flow)
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
+                } label: {
+                    Text("Set same learning goal and duration")
+                        .font(.footnote)
+                        .foregroundStyle(Theme.orange)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+    }
+}
+
 // MARK: - Preview
 
 private var isPreview: Bool {
@@ -434,6 +536,6 @@ private var isPreview: Bool {
 }
 
 #Preview {
-    // Wrap in a NavigationStack so the pencil link works in the preview
+    // Wrap in a NavigationStack so the links work in the preview
     NavigationStack { ActivityView().preferredColorScheme(.dark) }
 }
