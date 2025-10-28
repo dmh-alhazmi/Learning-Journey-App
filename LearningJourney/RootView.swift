@@ -11,7 +11,7 @@ struct RootView: View {
     @AppStorage("has_seen_onboarding") private var hasSeenOnboarding = false
     @AppStorage("has_set_goal")        private var hasSetGoal = false
 
-    @State private var showOnboarding   = false
+    @State private var showOnboarding   = true
     @State private var showLearningGoal = false
 
     var body: some View {
