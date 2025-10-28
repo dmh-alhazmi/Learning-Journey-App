@@ -30,7 +30,7 @@ struct RootView: View {
                 // This closure is what your button should call
                 hasSeenOnboarding = true
                 showOnboarding = false          // dismiss
-                showLearningGoal = true         // then show the goal sheet
+                showLearningGoal = false         // then show the goal sheet
             }
         }
         .sheet(isPresented: $showLearningGoal) {

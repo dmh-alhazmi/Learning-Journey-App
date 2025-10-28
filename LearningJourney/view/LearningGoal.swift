@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UserNotifications
+import Swift
 
 struct LearningGoal: View {
     // MARK: - Stored
@@ -39,6 +40,13 @@ struct LearningGoal: View {
                         Image(systemName: "chevron.left")
                             .font(.title2.weight(.semibold))
                             .foregroundStyle(.white)
+                            //.glassEffect(.clear)
+                            .padding(18)
+                            .background(
+                                Circle()
+                                    .fill(Color.black.opacity(0.6))
+                                    .glassEffect(.clear .interactive(true))
+                                )
                     }
 
                     Spacer()
@@ -108,7 +116,7 @@ struct LearningGoal: View {
 
             // MARK: - Overlay confirmation (like your Sketch)
             if showConfirm {
-                Color.black.opacity(0.80).ignoresSafeArea()
+                Color.black.opacity(0.99).ignoresSafeArea()
                     .transition(.opacity)
 
                 VStack(spacing: 12) {
