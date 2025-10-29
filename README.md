@@ -1,6 +1,6 @@
 # 🌱 Learning Journey App
 
-**Developed by Deemah Alhazmi**  
+**Designed & Developed by Deemah Alhazmi**  
 ☕ Fueled by creativity, SwiftUI, and a good cup of coffee  
 
 ---
@@ -8,7 +8,20 @@
 ## 🍎 About This Project
 
 This project was created as part of my **second challenge at the Apple Developer Academy**.  
-The **design was provided**, and I was responsible for the **development and coding** of the app using **SwiftUI** and the **MVVM architecture**.
+The **design was provided** by our team, and I was responsible for the **development and coding** of the app using **SwiftUI** and the **MVVM architecture**.
+
+---
+
+## 📱 App Preview
+
+Here’s a glimpse into **Learning Journey** 👇  
+
+| Onboarding | Activity Page | Learning Goal | Calendar |
+|-------------|----------------|----------------|------------|
+| <img src="Downloads/onboarding.png" width="200"/> | <img src="images/activity.png" width="200"/> | <img src="images/goal.png" width="200"/> | <img src="images/calendar.png" width="200"/> |
+
+> 💡 Tip: Place your screenshots inside a folder named **images** in your project root,  
+> and rename them like `onboarding.png`, `activity.png`, etc.
 
 ---
 
