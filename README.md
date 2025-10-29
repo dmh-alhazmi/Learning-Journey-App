@@ -1,33 +1,74 @@
-# Learning-Journey-App
----
+# 🌱 Learning Journey App
 
-## 🧭 User Flow
-
-Below is the main user journey inside **LearningJourney** — showing how users move through tasks and views in the app.
-
-### 🪄 Task 1: Start Learning
-1. **Onboarding** → User sets a learning goal and duration  
-2. **LearningGoal Page** → Choose week, month, or year  
-3. **Activity Page** → Begin daily tracking
-
-### 🧩 Task 2: Log a Day as Learned or Frozen
-- From **Activity Page**, user selects:
-  - ✅ *Learned Today* → Day marked orange (progress)
-  - 🧊 *Freeze Day* → Day marked teal (rest)
-
-### 🔁 Task 3: Set New / Same Goal After Completion
-- When a goal period ends:
-  - ➕ *New Learning Goal* → Navigates to LearningGoal page  
-  - ♻️ *Same Goal* → Continues with same activity
-
-### ⚙️ Task 4: Change Learning Goal Anytime
-- Tap the **goal icon** on the Activity Page  
-- Update goal name or duration  
-
-### 🗓 Task 5: Open Calendar
-- Tap the **calendar icon** on the Activity Page  
-- See all previously learned or frozen days  
-- Scroll infinitely through past and future months  
+**Designed & Developed by Deemah Alhazmi**  
+☕ Fueled by creativity, SwiftUI, and a good cup of coffee.  
 
 ---
 
+## 🎯 What is Learning Journey?
+
+**Learning Journey** helps you stay consistent with your goals — learn something new, track your progress, and see how far you’ve come.  
+You can log your days as **Learned** or **Frozen (Rest)** and visualize your growth in a calendar view.
+
+---
+
+## 🚀 How It Works
+
+### 🪄 Step 1: Start Learning  
+1. **Onboarding** → Enter what you want to learn and how long you plan to learn it (week, month, or year).  
+2. **Activity Page** → Begin your journey and start tracking your daily progress.
+
+---
+
+### ✍️ Step 2: Log a Day  
+- ✅ **Log as Learned** → Marks the day in **orange** (you made progress 🎉)  
+- 🧊 **Log as Frozen** → Marks the day in **teal** (you took a rest day)  
+
+---
+
+### 🔁 Step 3: Update or Change Your Goal  
+If your goal is completed or you’d like to start something new:  
+- Tap the **Learning Goal icon**  
+- Edit your goal or duration  
+- Confirm the update → your streak resets for a fresh start!  
+
+---
+
+### 📅 Step 4: View Your Calendar  
+Check your **Learned** and **Frozen** days at a glance.  
+Scroll freely through past months and reflect on your progress.
+
+---
+
+## 🧩 App Structure (MVVM)
+
+| Layer | Description |
+|-------|--------------|
+| **Model** | Stores data such as goals, dates, and daily statuses. |
+| **View** | Displays all app screens (Onboarding, Activity, Goal, Calendar). |
+| **ViewModel** | Connects the logic between model and view. |
+
+---
+
+## 🛠️ Built With  
+- **SwiftUI 5** – Modern, declarative UI  
+- **Combine** – For state and event handling  
+- **MVVM Architecture** – Clear, modular code  
+- **@AppStorage** – For saving user goals locally  
+
+---
+
+## 💡 Future Ideas  
+- Daily notifications to log progress  
+- Weekly streak summary and badges  
+- Option to share your progress  
+
+---
+
+### 💬 About the Developer  
+Hi! I’m **Deemah Alhazmi**, a designer and iOS developer passionate about creativity, simplicity, and self-growth.  
+When I’m not designing or coding, you’ll find me sketching, journaling, or sipping coffee while building beautiful apps ☕✨  
+
+---
+
+> _“Small progress every day adds up to big results.”_
