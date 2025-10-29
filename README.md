@@ -18,7 +18,7 @@ Here’s a glimpse into **Learning Journey** 👇
 
 | Onboarding | Activity Page | Learning Goal | Calendar |
 |-------------|----------------|----------------|------------|
-| <img src="Images/onboarding.PNG" width="200"/> | <img src="Images/activity.png" width="200"/> | <img src="Images/goal.png" width="200"/> | <img src="Images/calendar.png" width="200"/> |
+| <img src="Images/onboarding.PNG" width="200"/> | <img src="Images/activity.PNG" width="200"/> | <img src="Images/goal.PNG" width="200"/> | <img src="Images/calendar.PNG" width="200"/> |
 
 > 💡 Tip: Place your screenshots inside a folder named **images** in your project root,  
 > and rename them like `onboarding.png`, `activity.png`, etc.
