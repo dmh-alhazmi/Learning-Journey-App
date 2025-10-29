@@ -1,74 +1,88 @@
 # 🌱 Learning Journey App
 
-**Designed & Developed by Deemah Alhazmi**  
-☕ Fueled by creativity, SwiftUI, and a good cup of coffee.  
+**Developed by Deemah Alhazmi**  
+☕ Fueled by creativity, SwiftUI, and a good cup of coffee  
+
+---
+
+## 🍎 About This Project
+
+This project was created as part of my **second challenge at the Apple Developer Academy**.  
+The **design was provided**, and I was responsible for the **development and coding** of the app using **SwiftUI** and the **MVVM architecture**.
 
 ---
 
 ## 🎯 What is Learning Journey?
 
-**Learning Journey** helps you stay consistent with your goals — learn something new, track your progress, and see how far you’ve come.  
-You can log your days as **Learned** or **Frozen (Rest)** and visualize your growth in a calendar view.
+**Learning Journey** helps users stay consistent with their personal learning goals —  
+encouraging daily progress and reflection through simple, gamified tracking.
+
+You can:
+- Set a learning goal (e.g., "Learn Swift")
+- Choose your plan (week, month, or year)
+- Log each day as **Learned** or **Frozen (Rest)**
+- View your overall progress in a beautiful calendar
 
 ---
 
-## 🚀 How It Works
+## 🪄 How It Works
 
-### 🪄 Step 1: Start Learning  
-1. **Onboarding** → Enter what you want to learn and how long you plan to learn it (week, month, or year).  
-2. **Activity Page** → Begin your journey and start tracking your daily progress.
+### 🧩 Step 1: Start Learning
+1. **Onboarding** → Enter your goal and duration  
+2. **Activity Page** → Start tracking your learning journey
 
 ---
 
-### ✍️ Step 2: Log a Day  
-- ✅ **Log as Learned** → Marks the day in **orange** (you made progress 🎉)  
-- 🧊 **Log as Frozen** → Marks the day in **teal** (you took a rest day)  
+### ✍️ Step 2: Log Your Progress  
+- ✅ **Learned Today** → Marks the day in **orange** (progress made)  
+- 🧊 **Freeze Day** → Marks the day in **teal** (rest day taken)
 
 ---
 
 ### 🔁 Step 3: Update or Change Your Goal  
-If your goal is completed or you’d like to start something new:  
-- Tap the **Learning Goal icon**  
-- Edit your goal or duration  
-- Confirm the update → your streak resets for a fresh start!  
+If you complete or wish to modify your goal:
+- Tap the **Learning Goal icon**
+- Update your topic or duration  
+- Confirm changes (your streak resets for a fresh start!)
 
 ---
 
 ### 📅 Step 4: View Your Calendar  
-Check your **Learned** and **Frozen** days at a glance.  
-Scroll freely through past months and reflect on your progress.
+See your full progress across days, weeks, and months.  
+Scroll through your calendar to reflect on how far you’ve come.
 
 ---
 
-## 🧩 App Structure (MVVM)
+## 🧠 Architecture
 
 | Layer | Description |
 |-------|--------------|
-| **Model** | Stores data such as goals, dates, and daily statuses. |
-| **View** | Displays all app screens (Onboarding, Activity, Goal, Calendar). |
-| **ViewModel** | Connects the logic between model and view. |
+| **Model** | Handles data like goals, plans, and daily logs |
+| **View** | Displays app screens (Onboarding, Activity, Goal, Calendar) |
+| **ViewModel** | Connects the data and logic between Model and View |
 
 ---
 
-## 🛠️ Built With  
-- **SwiftUI 5** – Modern, declarative UI  
-- **Combine** – For state and event handling  
-- **MVVM Architecture** – Clear, modular code  
-- **@AppStorage** – For saving user goals locally  
+## 🛠️ Technologies Used
+- **SwiftUI 5** → Modern, declarative UI framework  
+- **Combine** → Reactive event handling  
+- **MVVM** → Clean and organized architecture  
+- **@AppStorage** → Local data persistence  
 
 ---
 
-## 💡 Future Ideas  
-- Daily notifications to log progress  
-- Weekly streak summary and badges  
-- Option to share your progress  
+## 💡 Future Enhancements
+- Daily reminder notifications  
+- Achievement badges for streaks  
+- Progress sharing with friends  
 
 ---
 
-### 💬 About the Developer  
-Hi! I’m **Deemah Alhazmi**, a designer and iOS developer passionate about creativity, simplicity, and self-growth.  
-When I’m not designing or coding, you’ll find me sketching, journaling, or sipping coffee while building beautiful apps ☕✨  
+### 👩🏻‍💻 About the Developer
+Hi! I’m **Deemah Alhazmi**, an iOS Developer and designer at the Apple Developer Academy.  
+I’m passionate about building apps that blend creativity, simplicity, and purpose.  
+When I’m not coding, you’ll probably find me sketching or enjoying a good cup of coffee ☕✨  
 
 ---
 
-> _“Small progress every day adds up to big results.”_
+> _“Consistency turns learning into growth — one day at a time.”_
