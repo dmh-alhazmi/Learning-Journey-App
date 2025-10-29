@@ -81,7 +81,7 @@ Scroll through your calendar to reflect on how far you’ve come.
 
 ---
 
-##📲 Installation
+## 📲 Installation
 
 - Clone the repository
 - Open the project in Xcode
