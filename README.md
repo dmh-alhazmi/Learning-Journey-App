@@ -81,6 +81,15 @@ Scroll through your calendar to reflect on how far you’ve come.
 
 ---
 
+##📲 Installation
+
+- Clone the repository
+- Open the project in Xcode
+- Select your target device (iPhone Simulator or physical device).
+- Build and run the project
+
+---
+
 ## 💡 Future Enhancements
 - Daily reminder notifications  
 - Achievement badges for streaks  
